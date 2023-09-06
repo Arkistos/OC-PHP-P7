@@ -18,6 +18,7 @@ class UserFixtures extends Fixture
 
         $manager->flush();
     }
+    
 
     public function makeUser(string $firstname, string $lastname, string $email, string $plainPassword):User
     {
