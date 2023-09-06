@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use JMS\Serializer\SerializerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ProductController extends AbstractController
 {
@@ -16,12 +18,21 @@ class ProductController extends AbstractController
     public function getProducts(
         ProductRepository $productRepository, 
         SerializerInterface $serializer,
-        Request $request
+        Request $request,
+        TagAwareCacheInterface $cache
         ): JsonResponse
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 5);
-        $products = $productRepository->findAllPaginated($page, $limit);
+        $cacheId = "getProducts-".$page."-".$limit;
+        $products = $cache->get($cacheId, function(ItemInterface $item) use ($productRepository, $page, $limit){
+            $item->expiresAfter(900);
+            $item->tag("productsCache");
+            return $productRepository->findAllPaginated($page, $limit);
+        });
+
+
+
         $jsonProducts = $serializer->serialize($products,'json');
         return new JsonResponse($jsonProducts, Response::HTTP_OK, [], true);
     }
