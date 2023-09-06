@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Hateoas\Relation(
@@ -36,6 +37,7 @@ class User
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['getUsers'])]
+    #[Assert\Email()]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
