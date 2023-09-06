@@ -7,18 +7,15 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
 
-
 /**
  * @Hateoas\Relation(
  *     "self",
  *     href = @Hateoas\Route(
  *         "product_details",
- *          parameters = {"id" = "expr(object.getId())"}     
+ *          parameters = {"id" = "expr(object.getId())"}
  *      )
  * )
  */
-
-
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {

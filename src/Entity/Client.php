@@ -6,9 +6,9 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client implements UserInterface, PasswordAuthenticatedUserInterface
@@ -58,7 +58,7 @@ class Client implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUsername():string
+    public function getUsername(): string
     {
         return $this->getUserIdentifier();
     }

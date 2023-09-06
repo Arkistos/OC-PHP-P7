@@ -18,21 +18,18 @@ class UserFixtures extends Fixture
 
         $manager->flush();
     }
-    
 
-    public function makeUser(string $firstname, string $lastname, string $email, string $plainPassword):User
+    public function makeUser(string $firstname, string $lastname, string $email, string $plainPassword): User
     {
         $user = new User();
         $user->setFirstname($firstname);
         $user->setLastname($lastname);
         $user->setEmail($email);
-        $factory = new PasswordHasherFactory(['common'=>['algorithm'=> 'bcrypt']]);
+        $factory = new PasswordHasherFactory(['common' => ['algorithm' => 'bcrypt']]);
         $hasher = $factory->getPasswordHasher('common');
         $user->setPassword($hasher->hash($plainPassword));
         $user->setClient($this->getReference('client'));
 
         return $user;
     }
-
-
 }

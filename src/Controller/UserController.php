@@ -68,7 +68,7 @@ class UserController extends AbstractController
         $client = $token->getUser();
         $user->setClient($client);
         $errors = $validatorInterface->validate($user);
-        if(0<$errors->count()){
+        if (0 < $errors->count()) {
             return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
         $entityManager->persist($user);
@@ -79,18 +79,17 @@ class UserController extends AbstractController
         $context = SerializationContext::create()->setGroups(['getUsers']);
         $jsonUser = $serializer->serialize($user, 'json', $context);
 
-        $location = $urlGenerator->generate('user_details', ['id'=>$user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate('user_details', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["location" => $location], true);
+        return new JsonResponse($jsonUser, Response::HTTP_CREATED, ['location' => $location], true);
     }
 
-    #[Route('/api/users/{id}', name:'delete_user', methods:['DELETE'])]
+    #[Route('/api/users/{id}', name: 'delete_user', methods: ['DELETE'])]
     public function deleteUser(
-        User $user, 
+        User $user,
         TagAwareCacheInterface $cache,
         EntityManagerInterface $entityManager
-        ):JsonResponse
-    {
+    ): JsonResponse {
         $entityManager->remove($user);
         $entityManager->flush();
 
