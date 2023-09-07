@@ -1,0 +1,8 @@
+{
+    "name": "BileMo API",
+    "short_name": "BMAPI",
+    "description": "API exposant les mobiles distribué par BileMo",
+    "start_url": "/",
+    "display": "standalone"
+  }
+  
