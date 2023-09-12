@@ -27,22 +27,26 @@ class User
     #[Groups(['getUsers'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: false)]
     #[Groups(['getUsers'])]
-    private ?string $firstname = null;
+    #[Assert\NotBlank()]
+    private string $firstname;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: false)]
     #[Groups(['getUsers'])]
-    private ?string $lastname = null;
+    #[Assert\NotBlank()]
+    private string $lastname;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: false)]
     #[Groups(['getUsers'])]
     #[Assert\Email()]
-    private ?string $email = null;
+    #[Assert\NotBlank()]
+    private string $email;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: false)]
     #[Groups(['getUsers'])]
-    private ?string $password = null;
+    #[Assert\NotBlank()]
+    private string $password;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]

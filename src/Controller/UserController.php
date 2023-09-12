@@ -64,8 +64,9 @@ class UserController extends AbstractController
         ValidatorInterface $validatorInterface
     ): JsonResponse {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
-        $token = $tokenStorageInterface->getToken();
-        $client = $token->getUser();
+        $client = $tokenStorageInterface
+                    ->getToken()
+                    ->getUser();
         $user->setClient($client);
         $errors = $validatorInterface->validate($user);
         if (0 < $errors->count()) {
