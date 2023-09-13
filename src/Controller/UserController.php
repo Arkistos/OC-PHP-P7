@@ -48,7 +48,6 @@ class UserController extends AbstractController
             $users['pages']
         );
 
-        // $context = SerializationContext::create()->setGroups(['getUsers']);
         $context = SerializationContext::create()->enableMaxDepthChecks();
         $jsonUsers = $serializer->serialize($users, 'json', $context);
 
