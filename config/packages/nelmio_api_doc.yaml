@@ -21,11 +21,87 @@ nelmio_api_doc:
                                     $ref: '#/components/schemas/Credentials'
                     responses:
                         '200':
-                            description: Récupère le token JWT
+                            description: OK
                             content:
                                 application/json:
                                     schema:
                                         $ref: '#/components/schemas/Token'
+            /api/products:
+                get:
+                    tags:
+                        - Products
+                    summary: Permet d'obtenir la liste des produits
+                    responses:
+                        '200':
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Products'
+            /api/products/{id}:
+                get:
+                    tags:
+                        - Products
+                    summary: Permet d'obtenir les détails d'un produit
+                    responses:
+                        '200':
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Product'
+            /api/users:
+                get:
+                    tags:
+                        - Users
+                    summary: Permet d'obtenir la liste des utilisateurs
+                    responses:
+                        '200':
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Users'
+                post:
+                    tags:
+                        - Users
+                    summary: Permet de créer un utilisateur
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/PostUser'
+                    responses:
+                        '201':
+                            description: Created
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/User'
+            /api/users/{id}:
+                get:
+                    tags:
+                        - Users
+                    summary: Permet d'obtenir les détails d'un utilisateur
+                    responses:
+                        '200':
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/User'
+                delete:
+                    tags:
+                        - Users
+                    summary: Permet de supprimer un utilisateur
+                    responses:
+                        '204':
+                            description: No Content
+            /api/doc.json:
+                get:
+                    tags:
+                        - Documentation
+                    summary: Accès à la documentation
         components:
             schemas:
                 Token:
@@ -43,6 +119,284 @@ nelmio_api_doc:
                         password:
                             type: string
                             default: password
+                Products:
+                    type: object
+                    properties:
+                        page:
+                            type: int
+                            default: 1
+                            readOnly: true
+                        limit:
+                            type: int
+                            default: 5
+                            readOnly: true
+                        pages:
+                            type: int
+                            default: 1
+                            readOnly: true 
+                        _links:
+                            type: object
+                            properties:
+                                self:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=1
+                                            readOnly: true
+                                    readOnly: true
+                                first:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=1
+                                            readOnly: true
+                                    readOnly: true
+                                last:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=2
+                                            readOnly: true
+                                    readOnly: true
+                                next:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=2
+                                            readOnly: true
+                                    readOnly: true
+                        _embedded:
+                            type: object
+                            properties:
+                                items: 
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            id: 
+                                                type: integer
+                                                default: 1
+                                            name: 
+                                                type: string
+                                                default: Nom du produit
+                                            brand: 
+                                                type: string
+                                                default: Marque du Produit
+                                            price: 
+                                                type: number
+                                                default: 123.43
+                                            description: 
+                                                type: string
+                                                default: Description du produit
+                                            created_at: 
+                                                type: string
+                                                default: '2023-07-21T17:32:28Z'
+                                            _links: 
+                                                type: object
+                                                properties: 
+                                                    self: 
+                                                        type: object
+                                                        properties:
+                                                            href: 
+                                                                type: string 
+                                                                default: /api/products/1          
+                Product: 
+                    type: object
+                    properties:
+                        id: 
+                            type: integer
+                            default: 1
+                        name: 
+                            type: string
+                            default: Nom du produit
+                        brand: 
+                            type: string
+                            default: Marque du Produit
+                        price: 
+                            type: number
+                            default: 123.43
+                        description: 
+                            type: string
+                            default: Description du produit
+                        created_at: 
+                            type: string
+                            default: '2023-07-21T17:32:28Z'
+                        _links: 
+                            type: object
+                            properties: 
+                                self: 
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string 
+                                            default: /api/products/1      
+                Users:
+                    type: object
+                    properties:
+                        page:
+                            type: int
+                            default: 1
+                            readOnly: true
+                        limit:
+                            type: int
+                            default: 5
+                            readOnly: true
+                        pages:
+                            type: int
+                            default: 1
+                            readOnly: true 
+                        _links:
+                            type: object
+                            properties:
+                                self:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=1
+                                            readOnly: true
+                                    readOnly: true
+                                first:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=1
+                                            readOnly: true
+                                    readOnly: true
+                                last:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=2
+                                            readOnly: true
+                                    readOnly: true
+                                next:
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string
+                                            default: /api/products?page=2
+                                            readOnly: true
+                                    readOnly: true
+                        _embedded:
+                            type: object
+                            properties:
+                                items:
+                                    type: object
+                                    properties:
+                                        users: 
+                                            type: array
+                                            items:
+                                                type: object
+                                                properties:
+                                                    id: 
+                                                        type: integer
+                                                        default: 1
+                                                    firstname: 
+                                                        type: string
+                                                        default: Firstname
+                                                    lastname: 
+                                                        type: string
+                                                        default: Lastname
+                                                    email: 
+                                                        type: string
+                                                        default: user@user.com
+                                                    password: 
+                                                        type: string
+                                                        default: $2y$13$jJqSbUpYGqertertiothazopneIohyR2Y8BOqBTmRN7guFY4dBaEWiq2C
+                                                    client: 
+                                                        type: object
+                                                        properties:
+                                                            id:
+                                                                type: integer
+                                                                default: 1
+                                                            email:
+                                                                type: string
+                                                                default: client@client.com
+                                                            roles:
+                                                                type: array
+                                                                items:
+                                                                    type: string
+                                                            users:
+                                                                type: array
+                                                                items: 
+                                                                    type: string
+                                                    _links: 
+                                                        type: object
+                                                        properties: 
+                                                            self: 
+                                                                type: object
+                                                                properties:
+                                                                    href: 
+                                                                        type: string 
+                                                                        default: /api/users/1      
+                User:
+                    type: object
+                    properties:
+                        id: 
+                            type: integer
+                            default: 1
+                        firstname: 
+                            type: string
+                            default: Firstname
+                        lastname: 
+                            type: string
+                            default: Lastname
+                        email: 
+                            type: string
+                            default: user@user.com
+                        password: 
+                            type: string
+                            default: $2y$13$jJqSbUpYGqertertiothazopneIohyR2Y8BOqBTmRN7guFY4dBaEWiq2C
+                        client: 
+                            type: object
+                            properties:
+                                id:
+                                    type: integer
+                                    default: 1
+                                email:
+                                    type: string
+                                    default: client@client.com
+                                roles:
+                                    type: array
+                                    items:
+                                        type: string
+                        _links: 
+                            type: object
+                            properties: 
+                                self: 
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string 
+                                            default: /api/users/1
+                                delete: 
+                                    type: object
+                                    properties:
+                                        href: 
+                                            type: string 
+                                            default: /api/users/1
+                PostUser:
+                    type: object
+                    properties: 
+                        firstname:
+                            type: string
+                            default: firstname
+                        lastname:
+                            type: string
+                            default: lastname
+                        email:
+                            type: string
+                            default: user@user.com
+                        password:
+                            type: string
+                            default: $2y$13$MEb6uYWb.AzefihzefiugofDiYFHum3RXsZsvBfHYHOsQx83QJa
             securitySchemes:
                 bearerAuth:
                     type: apiKey
