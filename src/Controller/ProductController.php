@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
+use Hateoas\Representation\CollectionRepresentation;
+use Hateoas\Representation\PaginatedRepresentation;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,11 +28,19 @@ class ProductController extends AbstractController
         $limit = $request->get('limit', 5);
         $cacheId = 'getProducts-'.$page.'-'.$limit;
         $products = $cache->get($cacheId, function (ItemInterface $item) use ($productRepository, $page, $limit) {
-            $item->expiresAfter(900);
+            $item->expiresAfter(1);
             $item->tag('productsCache');
 
             return $productRepository->findAllPaginated($page, $limit);
         });
+
+        $products = new PaginatedRepresentation(new CollectionRepresentation($products['products']),
+            'products',
+            [],
+            $page,
+            $limit,
+            $products['pages']
+        );
 
         $jsonProducts = $serializer->serialize($products, 'json');
 

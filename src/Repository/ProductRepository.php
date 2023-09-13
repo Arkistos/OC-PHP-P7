@@ -27,6 +27,14 @@ class ProductRepository extends ServiceEntityRepository
                         ->setFirstResult(($page - 1) * $limit)
                         ->setMaxResults($limit);
 
-        return $queryBuilder->getQuery()->getResult();
+        $productsPaginated = $queryBuilder->getQuery()->getResult();
+
+        $queryBuilder = $this->createQueryBuilder('p')
+                        ->select('count(p.id)');
+        $pages = $queryBuilder->getQuery()->getResult()[0][1];
+
+        return ['products' => $productsPaginated,
+                'pages' => $pages,
+            ];
     }
 }

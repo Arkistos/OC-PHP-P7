@@ -27,6 +27,14 @@ class UserRepository extends ServiceEntityRepository
                         ->setFirstResult(($page - 1) * $limit)
                         ->setMaxResults($limit);
 
-        return $queryBuilder->getQuery()->getResult();
+        $usersPaginated = $queryBuilder->getQuery()->getResult();
+
+        $queryBuilder = $this->createQueryBuilder('u')
+                        ->select('count(u.id)');
+        $pages = $queryBuilder->getQuery()->getResult()[0][1];
+
+        return ['users' => $usersPaginated,
+                'pages' => $pages,
+            ];
     }
 }

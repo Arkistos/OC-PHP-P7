@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Hateoas\Representation\CollectionRepresentation;
+use Hateoas\Representation\PaginatedRepresentation;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,13 +34,22 @@ class UserController extends AbstractController
 
         $cacheId = 'users-'.$page.'-'.$limit;
         $users = $cache->get($cacheId, function (ItemInterface $item) use ($userRepository, $page, $limit) {
-            $item->expiresAfter(900);
+            $item->expiresAfter(1);
             $item->tag('usersCache');
 
             return $userRepository->getUsersPaginated($page, $limit);
         });
 
-        $context = SerializationContext::create()->setGroups(['getUsers']);
+        $users = new PaginatedRepresentation(new CollectionRepresentation($users),
+            'users',
+            [],
+            $page,
+            $limit,
+            $users['pages']
+        );
+
+        // $context = SerializationContext::create()->setGroups(['getUsers']);
+        $context = SerializationContext::create()->enableMaxDepthChecks();
         $jsonUsers = $serializer->serialize($users, 'json', $context);
 
         return new JsonResponse($jsonUsers, Response::HTTP_OK, [], true);

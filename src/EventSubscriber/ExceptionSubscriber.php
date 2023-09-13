@@ -17,13 +17,13 @@ class ExceptionSubscriber implements EventSubscriberInterface
         if ($exception instanceof NotFoundHttpException) {
             $data = [
                 'status' => $exception->getStatusCode(),
-                'message' => 'Not found'
+                'message' => 'Not found',
             ];
             $event->setResponse(new JsonResponse($data));
-        } else if ($exception instanceof HttpException) {
+        } elseif ($exception instanceof HttpException) {
             $data = [
                 'status' => $exception->getStatusCode(),
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ];
             $event->setResponse(new JsonResponse($data));
         } else {

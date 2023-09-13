@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -13,6 +14,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "self",
  *     href = @Hateoas\Route(
  *         "user_details",
+ *          parameters = {"id" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getUsers")
+ * )
+ * @Hateoas\Relation(
+ *     "delete",
+ *     href = @Hateoas\Route(
+ *         "delete_user",
  *          parameters = {"id" = "expr(object.getId())"}
  *      ),
  *      exclusion = @Hateoas\Exclusion(groups="getUsers")
@@ -51,6 +60,7 @@ class User
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['getUsers'])]
+    #[MaxDepth(1)]
     private ?Client $client = null;
 
     public function getId(): ?int
