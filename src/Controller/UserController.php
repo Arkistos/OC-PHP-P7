@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,20 +28,25 @@ class UserController extends AbstractController
         UserRepository $userRepository,
         Request $request,
         TagAwareCacheInterface $cache,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        TokenStorageInterface $tokenStorageInterface
     ): JsonResponse {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 5);
 
+        $client = $tokenStorageInterface
+                    ->getToken()
+                    ->getUser();
+        
+        
         $cacheId = 'users-'.$page.'-'.$limit;
-        $users = $cache->get($cacheId, function (ItemInterface $item) use ($userRepository, $page, $limit) {
+        $users = $cache->get($cacheId, function (ItemInterface $item) use ($userRepository, $page, $limit, $client) {
             $item->expiresAfter(1);
             $item->tag('usersCache');
-
-            return $userRepository->getUsersPaginated($page, $limit);
+            return $userRepository->getUsersPaginated($client, $page, $limit);
         });
 
-        $users = new PaginatedRepresentation(new CollectionRepresentation($users),
+        $users = new PaginatedRepresentation(new CollectionRepresentation($users['users']),
             'users',
             [],
             $page,
