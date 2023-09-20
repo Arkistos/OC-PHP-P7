@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Client;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,9 +22,14 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function getUsersPaginated(int $page, int $limit = 5): array
+    public function getUsersPaginated(Client $client, int $page, int $limit = 5): array
     {
-        $queryBuilder = $this->createQueryBuilder('u')
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder()
+                        ->select('c', 'u')
+                        ->from('App\Entity\User', 'u')
+                        ->join('u.client', 'c')
+                        ->andWhere('c.id = :id')
+                        ->setParameter('id', $client->getId())
                         ->setFirstResult(($page - 1) * $limit)
                         ->setMaxResults($limit);
 
@@ -31,7 +37,8 @@ class UserRepository extends ServiceEntityRepository
 
         $queryBuilder = $this->createQueryBuilder('u')
                         ->select('count(u.id)');
-        $pages = $queryBuilder->getQuery()->getResult()[0][1];
+
+        $pages = ceil($queryBuilder->getQuery()->getResult()[0][1] / $limit);
 
         return ['users' => $usersPaginated,
                 'pages' => $pages,

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,20 +28,28 @@ class UserController extends AbstractController
         UserRepository $userRepository,
         Request $request,
         TagAwareCacheInterface $cache,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        TokenStorageInterface $tokenStorageInterface
     ): JsonResponse {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 5);
 
-        $cacheId = 'users-'.$page.'-'.$limit;
-        $users = $cache->get($cacheId, function (ItemInterface $item) use ($userRepository, $page, $limit) {
+        /**
+         * @var Client $client
+         */
+        $client = $tokenStorageInterface
+                    ->getToken()
+                    ->getUser();
+
+        $cacheId = 'users-'.$page.'-'.$limit.'-'.$client->getId();
+        $users = $cache->get($cacheId, function (ItemInterface $item) use ($userRepository, $page, $limit, $client) {
             $item->expiresAfter(1);
             $item->tag('usersCache');
 
-            return $userRepository->getUsersPaginated($page, $limit);
+            return $userRepository->getUsersPaginated($client, $page, $limit);
         });
 
-        $users = new PaginatedRepresentation(new CollectionRepresentation($users),
+        $users = new PaginatedRepresentation(new CollectionRepresentation($users['users']),
             'users',
             [],
             $page,
@@ -48,15 +57,27 @@ class UserController extends AbstractController
             $users['pages']
         );
 
-        $context = SerializationContext::create()->enableMaxDepthChecks();
-        $jsonUsers = $serializer->serialize($users, 'json', $context);
+        $jsonUsers = $serializer->serialize($users, 'json');
 
         return new JsonResponse($jsonUsers, Response::HTTP_OK, [], true);
     }
 
     #[Route('/api/users/{id}', name: 'user_details', methods: ['GET'])]
-    public function getUserDetails(User $user, SerializerInterface $serializer): JsonResponse
-    {
+    public function getUserDetails(
+        User $user,
+        SerializerInterface $serializer,
+        TokenStorageInterface $tokenStorageInterface
+    ): JsonResponse {
+        /**
+         * @var Client $client
+         */
+        $client = $tokenStorageInterface
+                    ->getToken()
+                    ->getUser();
+        if ($user->getClient()->getId() != $client->getId()) {
+            return new JsonResponse('', Response::HTTP_FORBIDDEN, [], true);
+        }
+
         $context = SerializationContext::create()->setGroups(['getUsers']);
         $jsonUser = $serializer->serialize($user, 'json', $context);
 
@@ -99,8 +120,19 @@ class UserController extends AbstractController
     public function deleteUser(
         User $user,
         TagAwareCacheInterface $cache,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        TokenStorageInterface $tokenStorageInterface
     ): JsonResponse {
+        /**
+         * @var Client $client
+         */
+        $client = $tokenStorageInterface
+                    ->getToken()
+                    ->getUser();
+        if ($user->getClient()->getId() != $client->getId()) {
+            return new JsonResponse('', Response::HTTP_FORBIDDEN, [], true);
+        }
+
         $entityManager->remove($user);
         $entityManager->flush();
 

@@ -26,6 +26,14 @@ class ClientFixtures extends Fixture
 
         $manager->persist($client);
 
+        $client = new Client();
+        $client->setEmail('user2@client.com');
+        $hashedPassword = $this->passwordHasher->hashPassword($client, 'password');
+        $client->setPassword($hashedPassword);
+        $this->addReference('client2', $client);
+
+        $manager->persist($client);
+
         $manager->flush();
     }
 }
