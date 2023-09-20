@@ -69,8 +69,21 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/users/{id}', name: 'user_details', methods: ['GET'])]
-    public function getUserDetails(User $user, SerializerInterface $serializer): JsonResponse
-    {
+    public function getUserDetails(
+        User $user,
+        SerializerInterface $serializer,
+        TokenStorageInterface $tokenStorageInterface
+    ): JsonResponse {
+        /**
+         * @var Client $client
+         */
+        $client = $tokenStorageInterface
+                    ->getToken()
+                    ->getUser();
+        if ($user->getClient()->getId() != $client->getId()) {
+            return new JsonResponse('', Response::HTTP_FORBIDDEN, [], true);
+        }
+
         $context = SerializationContext::create()->setGroups(['getUsers']);
         $jsonUser = $serializer->serialize($user, 'json', $context);
 
@@ -113,8 +126,19 @@ class UserController extends AbstractController
     public function deleteUser(
         User $user,
         TagAwareCacheInterface $cache,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        TokenStorageInterface $tokenStorageInterface
     ): JsonResponse {
+        /**
+         * @var Client $client
+         */
+        $client = $tokenStorageInterface
+                    ->getToken()
+                    ->getUser();
+        if ($user->getClient()->getId() != $client->getId()) {
+            return new JsonResponse('', Response::HTTP_FORBIDDEN, [], true);
+        }
+
         $entityManager->remove($user);
         $entityManager->flush();
 
