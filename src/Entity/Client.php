@@ -36,6 +36,7 @@ class Client implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: User::class)]
+    #[Exclude()]
     private Collection $users;
 
     public function __construct()

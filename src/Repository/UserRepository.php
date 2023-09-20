@@ -22,7 +22,7 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function getUsersPaginated( $client,int $page, int $limit = 5): array
+    public function getUsersPaginated(Client $client,int $page, int $limit = 5): array
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder()
                         ->select('c', 'u')

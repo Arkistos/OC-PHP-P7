@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Hateoas\HateoasBuilder;
 use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Representation\PaginatedRepresentation;
 use JMS\Serializer\SerializationContext;
@@ -34,15 +35,18 @@ class UserController extends AbstractController
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 5);
 
+        /**
+         * @var Client $client
+         */
         $client = $tokenStorageInterface
                     ->getToken()
                     ->getUser();
-        
-        
-        $cacheId = 'users-'.$page.'-'.$limit;
+
+        $cacheId = 'users-'.$page.'-'.$limit.'-'.$client->getId();
         $users = $cache->get($cacheId, function (ItemInterface $item) use ($userRepository, $page, $limit, $client) {
             $item->expiresAfter(1);
             $item->tag('usersCache');
+
             return $userRepository->getUsersPaginated($client, $page, $limit);
         });
 
@@ -54,8 +58,12 @@ class UserController extends AbstractController
             $users['pages']
         );
 
-        $context = SerializationContext::create()->enableMaxDepthChecks();
-        $jsonUsers = $serializer->serialize($users, 'json', $context);
+        // $hateoas = HateoasBuilder::create()->setDefaultJsonSerializer($serializer)->build();
+        // $json = $hateoas->serialize($users, 'json', SerializationContext::create()->setGroups(['getUsers']));
+
+        // $context = SerializationContext::create()->enableMaxDepthChecks();
+        // context = SerializationContext::create()->setGroups(['getUsers']);
+        $jsonUsers = $serializer->serialize($users, 'json');
 
         return new JsonResponse($jsonUsers, Response::HTTP_OK, [], true);
     }
