@@ -6,7 +6,6 @@ use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Hateoas\HateoasBuilder;
 use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Representation\PaginatedRepresentation;
 use JMS\Serializer\SerializationContext;
@@ -58,11 +57,6 @@ class UserController extends AbstractController
             $users['pages']
         );
 
-        // $hateoas = HateoasBuilder::create()->setDefaultJsonSerializer($serializer)->build();
-        // $json = $hateoas->serialize($users, 'json', SerializationContext::create()->setGroups(['getUsers']));
-
-        // $context = SerializationContext::create()->enableMaxDepthChecks();
-        // context = SerializationContext::create()->setGroups(['getUsers']);
         $jsonUsers = $serializer->serialize($users, 'json');
 
         return new JsonResponse($jsonUsers, Response::HTTP_OK, [], true);
