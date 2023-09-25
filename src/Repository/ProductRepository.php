@@ -31,7 +31,7 @@ class ProductRepository extends ServiceEntityRepository
 
         $queryBuilder = $this->createQueryBuilder('p')
                         ->select('count(p.id)');
-        $pages = $queryBuilder->getQuery()->getResult()[0][1];
+        $pages = ceil($queryBuilder->getQuery()->getResult()[0][1] / $limit);
 
         return ['products' => $productsPaginated,
                 'pages' => $pages,
